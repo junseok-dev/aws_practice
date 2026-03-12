@@ -23,11 +23,12 @@ jobs:
           aws-region: ap-northeast-2 # Update to your region (e.g., ap-northeast-2 for Seoul)
 
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@v0.1.10
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }} # e.g., ubuntu or ec2-user
+          username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
+          command_timeout: 30m
           script: |
             set -e  # Exit immediately if any command fails
             
@@ -38,6 +39,17 @@ jobs:
             echo "Cloning fresh copy from GitHub..."
             git clone https://github.com/${{ github.repository }}.git ~/aws_practice
             cd ~/aws_practice
+            
+            # Optimization: Ensure swap space exists to prevent OOM (Out Of Memory) during build
+            # t2.micro has only 1GB RAM, which is often not enough for building AI packages
+            if [ $(free -m | awk '/^Swap:/{print $2}') -eq 0 ]; then
+              echo "Creating 2GB swap file to assist build process..."
+              sudo fallocate -l 2G /swapfile
+              sudo chmod 600 /swapfile
+              sudo mkswap /swapfile
+              sudo swapon /swapfile
+              echo "Swap file created and enabled."
+            fi
             
             # Debug: Verify requirements.txt content on the server
             echo "Verifying backend/requirements.txt content on server:"
