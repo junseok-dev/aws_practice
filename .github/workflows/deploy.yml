@@ -29,15 +29,19 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }} # e.g., ubuntu or ec2-user
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            # Force sync with the latest code from main branch
-            if [ -d "~/aws_practice" ]; then
-              cd ~/aws_practice
-              git fetch --all
-              git reset --hard origin/main
-            else
-              git clone https://github.com/${{ github.repository }}.git ~/aws_practice
-              cd ~/aws_practice
-            fi
+            set -e  # Exit immediately if any command fails
+            
+            # Nuclear Reset: Delete existing folder to ensure a 100% clean sync
+            echo "Performing Nuclear Reset of existing code..."
+            rm -rf ~/aws_practice
+            
+            echo "Cloning fresh copy from GitHub..."
+            git clone https://github.com/${{ github.repository }}.git ~/aws_practice
+            cd ~/aws_practice
+            
+            # Debug: Verify requirements.txt content on the server
+            echo "Verifying backend/requirements.txt content on server:"
+            cat backend/requirements.txt
             
             # Go to backend directory where docker-compose is located
             cd backend
