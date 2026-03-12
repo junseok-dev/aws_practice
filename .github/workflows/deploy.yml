@@ -29,10 +29,11 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }} # e.g., ubuntu or ec2-user
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            # Navigate to the project directory or clone if it doesn't exist
+            # Force sync with the latest code from main branch
             if [ -d "~/aws_practice" ]; then
               cd ~/aws_practice
-              git pull origin main
+              git fetch --all
+              git reset --hard origin/main
             else
               git clone https://github.com/${{ github.repository }}.git ~/aws_practice
               cd ~/aws_practice
@@ -47,11 +48,15 @@ jobs:
             echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
             # Add database variables here later for PostgreSQL integration
             
-            # Build and start Docker containers
+            # Build and start Docker containers (using --no-cache to ensure fresh requirements)
             sudo docker-compose down
-            sudo docker-compose up -d --build
+            sudo docker-compose build --no-cache
+            sudo docker-compose up -d
             
             # Run migrations (Optional: Can be moved out of deploy script to a separate job)
             sudo docker-compose exec -T web python manage.py migrate
             
+            echo "==============================================="
             echo "Deployment completed successfully!"
+            echo "Access your app at: http://${{ secrets.EC2_HOST }}:8000"
+            echo "==============================================="
