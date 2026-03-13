@@ -25,7 +25,8 @@
                 "options": {
                     "awslogs-group": "/ecs/hari-backend-task",
                     "awslogs-region": "ap-northeast-2",
-                    "awslogs-stream-prefix": "ecs"
+                    "awslogs-stream-prefix": "ecs",
+                    "awslogs-create-group": "true"
                 }
             }
         }
