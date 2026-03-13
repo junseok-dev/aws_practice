@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,7 @@ SECRET_KEY = 'django-insecure-dua(s)e0q*qn5a)@924c=!(=f^(ck^ac=wbk2_3!-0zb9*k0)r
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['hari-alb-1468135716.ap-northeast-2.elb.amazonaws.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -174,7 +175,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # WebSockets / Channels Settings
 # Use Redis as the channel layer, falling back to InMemory if REDIS_URL isn't set
-import os
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
