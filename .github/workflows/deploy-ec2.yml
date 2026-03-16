@@ -1,10 +1,11 @@
 name: 🖥️ [EC2] Deploy to Amazon EC2
 
 on:
+  # 팀 저장소 정책: main 브랜치로의 머지(Merge) 또는 직접 푸시 발생 시 배포 수행
   push:
     branches:
-      - main  # Set to your default branch
-  workflow_dispatch: # Allows manual trigger
+      - main
+  workflow_dispatch:
 
 jobs:
   deploy:
