@@ -26,7 +26,12 @@ SECRET_KEY = 'django-insecure-dua(s)e0q*qn5a)@924c=!(=f^(ck^ac=wbk2_3!-0zb9*k0)r
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['hari-alb-1468135716.ap-northeast-2.elb.amazonaws.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = [
+    'hari-alb-1468135716.ap-northeast-2.elb.amazonaws.com', 
+    '.elasticbeanstalk.com', 
+    'localhost', 
+    '127.0.0.1'
+]
 
 
 # Application definition
