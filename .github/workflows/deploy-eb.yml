@@ -1,0 +1,50 @@
+name: Deploy to Amazon Elastic Beanstalk
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  EB_APP_NAME: ${{ secrets.EB_APP_NAME }}
+  EB_ENV_NAME: ${{ secrets.EB_ENV_NAME }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Generate Deployment Package
+        run: |
+          cd backend
+          zip -r ../deploy.zip . -x "*.git*" "db.sqlite3" "__pycache__/*" "*.pyc"
+
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: ${{ env.EB_APP_NAME }}
+          environment_name: ${{ env.EB_ENV_NAME }}
+          version_label: "app-${{ github.sha }}"
+          region: ${{ env.AWS_REGION }}
+          deployment_package: deploy.zip
+
+      - name: Display Deployment Summary
+        run: |
+          echo "=========================================================="
+          echo "🚀 Deployment Completed Successfully!"
+          echo "=========================================================="
+          echo "### 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **App**: \`${{ env.EB_APP_NAME }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Env**: \`${{ env.EB_ENV_NAME }}\`" >> $GITHUB_STEP_SUMMARY
