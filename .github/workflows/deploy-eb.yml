@@ -41,20 +41,30 @@ jobs:
           deployment_package: deploy.zip
           wait_for_deployment: true
 
-      - name: Get EB Environment URL
-        id: get-url
+      - name: Get EB Environment Info
+        id: get-info
         run: |
-          URL=$(aws elasticbeanstalk describe-environments --application-name ${{ env.EB_APP_NAME }} --environment-names ${{ env.EB_ENV_NAME }} --query "Environments[0].CNAME" --output text)
-          echo "eb_url=http://$URL" >> $GITHUB_OUTPUT
+          # Get CNAME
+          CNAME=$(aws elasticbeanstalk describe-environments --application-name ${{ env.EB_APP_NAME }} --environment-names ${{ env.EB_ENV_NAME }} --query "Environments[0].CNAME" --output text)
+          
+          # Try to get Public IP (for Single Instance)
+          INSTANCE_ID=$(aws elasticbeanstalk describe-environment-resources --environment-name ${{ env.EB_ENV_NAME }} --query "EnvironmentResources.Instances[0].Id" --output text)
+          PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[0].Instances[0].PublicIpAddress" --output text)
+          
+          if [ "$PUBLIC_IP" != "None" ] && [ -n "$PUBLIC_IP" ]; then
+            echo "display_url=http://$PUBLIC_IP" >> $GITHUB_OUTPUT
+          else
+            echo "display_url=http://$CNAME" >> $GITHUB_OUTPUT
+          fi
 
       - name: Display Deployment Summary
         run: |
           echo "=========================================================="
           echo "🚀 Deployment Completed Successfully!"
-          echo "🔗 URL: ${{ steps.get-url.outputs.eb_url }}"
+          echo "🔗 운영서비스URL: ${{ steps.get-info.outputs.display_url }}"
           echo "=========================================================="
           echo "### 🚀 EB Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "- **Platform**: \`Elastic Beanstalk\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **운영서비스URL**: [${{ steps.get-info.outputs.display_url }}](${{ steps.get-info.outputs.display_url }})" >> $GITHUB_STEP_SUMMARY
           echo "- **App**: \`${{ env.EB_APP_NAME }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Env**: \`${{ env.EB_ENV_NAME }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **URL**: [${{ steps.get-url.outputs.eb_url }}](${{ steps.get-url.outputs.eb_url }})" >> $GITHUB_STEP_SUMMARY
