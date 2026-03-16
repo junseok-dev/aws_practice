@@ -41,3 +41,20 @@ Thumbs.db
 
 # Vector DB (ChromaDB) Database directory
 .chroma_db/
+
+# AWS/Security (Critical for Team Repos)
+*.pem
+*.pub
+credential*
+secret*
+
+# Archives/Deployment
+*.zip
+*.tar.gz
+*.rar
+
+# Migration/Temporary references
+*_migration_guide.md
+*_operational_guide.md
+tmp_*
+nodes/
