@@ -1,4 +1,4 @@
-name: Deploy to Amazon EC2
+name: 🖥️ [EC2] Deploy to Amazon EC2
 
 on:
   push:
@@ -73,6 +73,8 @@ jobs:
             sudo docker-compose exec -T web python manage.py migrate
             
             echo "==============================================="
-            echo "Deployment completed successfully!"
-            echo "Access your app at: http://${{ secrets.EC2_HOST }}:8000"
+            echo "### 🖥️ EC2 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+            echo "- **Target**: \`EC2 Standalone\`" >> $GITHUB_STEP_SUMMARY
+            echo "- **Host**: \`${{ secrets.EC2_HOST }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "- **Access URL**: [http://${{ secrets.EC2_HOST }}:8000](http://${{ secrets.EC2_HOST }}:8000)" >> $GITHUB_STEP_SUMMARY
             echo "==============================================="

@@ -1,4 +1,4 @@
-name: Deploy to Amazon Elastic Beanstalk
+name: 🚀 [EB] Deploy to Elastic Beanstalk
 on:
   push:
     branches:
@@ -39,12 +39,22 @@ jobs:
           version_label: "app-${{ github.sha }}"
           region: ${{ env.AWS_REGION }}
           deployment_package: deploy.zip
+          wait_for_deployment: true
+
+      - name: Get EB Environment URL
+        id: get-url
+        run: |
+          URL=$(aws elasticbeanstalk describe-environments --application-name ${{ env.EB_APP_NAME }} --environment-names ${{ env.EB_ENV_NAME }} --query "Environments[0].CNAME" --output text)
+          echo "eb_url=http://$URL" >> $GITHUB_OUTPUT
 
       - name: Display Deployment Summary
         run: |
           echo "=========================================================="
           echo "🚀 Deployment Completed Successfully!"
+          echo "🔗 URL: ${{ steps.get-url.outputs.eb_url }}"
           echo "=========================================================="
-          echo "### 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "### 🚀 EB Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Platform**: \`Elastic Beanstalk\`" >> $GITHUB_STEP_SUMMARY
           echo "- **App**: \`${{ env.EB_APP_NAME }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Env**: \`${{ env.EB_ENV_NAME }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **URL**: [${{ steps.get-url.outputs.eb_url }}](${{ steps.get-url.outputs.eb_url }})" >> $GITHUB_STEP_SUMMARY
