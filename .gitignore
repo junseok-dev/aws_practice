@@ -58,3 +58,10 @@ secret*
 *_operational_guide.md
 tmp_*
 nodes/
+
+# Node.js
+node_modules/
+package-lock.json
+
+# Claude Code / MCP 설정 (로컬 경로 포함)
+claude_config.json
