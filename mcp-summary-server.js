@@ -8,7 +8,6 @@ const server = new Server(
   { capabilities: { tools: {} } }
 );
 
-// 툴 목록 정의
 server.setRequestHandler("tools/list", async () => ({
   tools: [
     {
@@ -25,7 +24,6 @@ server.setRequestHandler("tools/list", async () => ({
   ]
 }));
 
-// 툴 실행
 server.setRequestHandler("tools/call", async (req) => {
   const dir = req.params.arguments.dir;
   const files = fs.readdirSync(dir);
